@@ -1,0 +1,27 @@
+import requests
+from bs4 import BeautifulSoup as BS
+url = 'http://www.cbr.ru/scripts/XML_daily.asp'
+r = requests.get(url)
+soup = BS(r.text, 'lxml')
+
+chars = soup.find_all('charcode')
+values = soup.find_all('value')
+nominals = soup.find_all('nominal')
+
+list = []
+
+for i in range(0, len(chars)):
+    rows = [chars[i].get_text(),
+            values[i].get_text(),
+            nominals[i].get_text()]
+    list.append(rows)
+
+lst = [x for l in list for x in l]
+lst = [x.replace(',', '.') for x in lst]
+
+nok = float(lst[lst.index('NOK') + 1]) / float(lst[lst.index('NOK') + 2])
+huf = float(lst[lst.index('HUF') + 1]) / float(lst[lst.index('HUF') + 2])
+
+course = nok/huf
+
+print(course)
